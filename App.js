@@ -1,33 +1,52 @@
 import React, { Component } from 'react';
-import TaskList from './TaskList';
-import TaskForm from './TaskForm';
+import ProductList from './ProductList';
+import FilterForm from './FilterForm';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tasks: [],
+      products: [],
+      filters: {
+        category: '',
+        priceRange: [0, 1000],
+      },
     };
   }
 
-  addTask = (task) => {
-    this.setState((prevState) => ({
-      tasks: [...prevState.tasks, task],
-    }));
-  };
+  componentDidMount() {
+    this.fetchProducts();
+  }
 
-  deleteTask = (taskId) => {
-    this.setState((prevState) => ({
-      tasks: prevState.tasks.filter((task) => task.id !== taskId),
-    }));
+  fetchProducts() {
+    // Simulate fetching products from an API
+    const products = [
+      { id: 1, name: 'Product 1', category: 'Electronics', price: 200 },
+      { id: 2, name: 'Product 2', category: 'Clothing', price: 50 },
+      { id: 3, name: 'Product 3', category: 'Electronics', price: 300 },
+    ];
+    this.setState({ products });
+  }
+
+  handleFilterChange = (newFilters) => {
+    this.setState({ filters: { ...this.state.filters, ...newFilters } });
   };
 
   render() {
+    const { products, filters } = this.state;
+
+    const filteredProducts = products.filter(
+      (product) =>
+        (filters.category === '' || product.category === filters.category) &&
+        product.price >= filters.priceRange[0] &&
+        product.price <= filters.priceRange[1]
+    );
+
     return (
-      <div className="App">
-        <h1>Task Manager</h1>
-        <TaskForm onAddTask={this.addTask} />
-        <TaskList tasks={this.state.tasks} onDeleteTask={this.deleteTask} />
+      <div>
+        <h1>Product Store</h1>
+        <FilterForm filters={filters} onFilterChange={this.handleFilterChange} />
+        <ProductList products={filteredProducts} />
       </div>
     );
   }
